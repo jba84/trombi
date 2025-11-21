@@ -83,61 +83,60 @@ The application follows a secure directory structure:
 │   ├── `install.php`               # Web-based installer
 │   ├── `front-controller.php`      # Front controller entry point
 │   ├── `index.php`                 # Main entry point
-│   ├── `staff-directory/`          # Application files (can be deployed in a subdirectory)
-│   │   ├── `admin/`                # Admin interface files
-│   │   │   ├── `auth/`             # Authentication system
-│   │   │   │   ├── `auth.php`      # Authentication utility functions
-│   │   │   │   ├── `check_login.php` # Login validation
-│   │   │   │   ├── `login-modal.php` # Login modal template
-│   │   │   │   ├── `login.php`     # Login form page
-│   │   │   │   └── `logout.php`    # Logout functionality
-│   │   │   ├── `add.php`           # Add new staff member
-│   │   │   ├── `companies.php`     # Company management interface
-│   │   │   ├── `departments.php`   # Department management interface
-│   │   │   ├── `edit.php`          # Edit existing staff member
-│   │   │   ├── `index.php`         # Admin dashboard page
-│   │   │   └── `settings.php`      # Application settings & placeholder image configuration
-│   │   ├── `assets/`               # CSS, JavaScript, images and other assets
-│   │   │   ├── `css/`              # Compiled CSS files
-│   │   │   ├── `fonts/`            # Font files
-│   │   │   │   ├── `Outfit/`       # Outfit font files
-│   │   │   │   └── `remixicon/`    # Remix icon font files
-│   │   │   ├── `images/`           # Image assets
-│   │   │   ├── `js/`               # JavaScript files
-│   │   │   │   ├── `admin-filters.js` # Admin-specific filtering functionality
-│   │   │   │   ├── `breakpoints.js` # Utility for accessing Tailwind breakpoints in JavaScript
-│   │   │   │   ├── `filter-core.js` # Core filtering logic shared between admin/frontend
-│   │   │   │   ├── `frontend-filters.js` # Frontend-specific filtering functionality
-│   │   │   │   ├── `i18n.js`       # Internationalization utilities
-│   │   │   │   ├── `staff-form-utils.js` # Shared utilities for staff add/edit forms
-│   │   │   │   └── `main.js`       # Main application JavaScript
-│   │   │   └── `vendor/`           # Third-party libraries
-│   │   ├── `includes/`             # PHP includes for the public pages
-│   │   │   ├── `404_handler.php`   # 404 error handler
-│   │   │   ├── `admin_footer.php`  # Admin page footer
-│   │   │   ├── `admin_header.php`  # Admin page header
-│   │   │   ├── `ajax_handlers.php` # AJAX request handlers
-│   │   │   ├── `AssetManager.php`  # Asset path management
-│   │   │   ├── `bootstrap.php`     # Application bootstrap and configuration
-│   │   │   ├── `check_duplicate.php` # AJAX endpoint for staff duplicate detection
-│   │   │   ├── `controllers/`      # MVC controllers
-│   │   │   │   ├── `AdminController.php` # Admin area controller
-│   │   │   │   ├── `AjaxController.php` # AJAX request controller
-│   │   │   │   ├── `AuthController.php` # Authentication controller
-│   │   │   │   ├── `HomeController.php` # Frontend controller
-│   │   │   │   └── `ImageController.php` # Image handling controller
-│   │   │   ├── `footer.php`        # Frontend page footer
-│   │   │   ├── `functions.php`     # Utility functions
-│   │   │   ├── `generate_placeholder.php` # Placeholder image generator
-│   │   │   ├── `header.php`        # Frontend page header
-│   │   │   ├── `LanguageManager.php` # Internationalization system
-│   │   │   ├── `MiddlewareStack.php` # Middleware implementation
-│   │   │   └── `Router.php`        # URL routing system
-│   │   ├── `uploads/`              # User uploaded content
-│   │   │   ├── `companies/`        # Company logo images
-│   │   │   ├── `logos/`            # Application logo images
-│   │   │   └── `placeholders/`     # Generated placeholder images (WebP format)
-│   │   └── `.htaccess`             # Apache configuration for subdirectory routing
+│   ├── `admin/`                    # Admin interface files
+│   │   ├── `auth/`                 # Authentication system
+│   │   │   ├── `auth.php`          # Authentication utility functions
+│   │   │   ├── `check_login.php`   # Login validation
+│   │   │   ├── `login-modal.php`   # Login modal template
+│   │   │   ├── `login.php`         # Login form page
+│   │   │   └── `logout.php`        # Logout functionality
+│   │   ├── `add.php`               # Add new staff member
+│   │   ├── `companies.php`         # Company management interface
+│   │   ├── `departments.php`       # Department management interface
+│   │   ├── `edit.php`              # Edit existing staff member
+│   │   ├── `index.php`             # Admin dashboard page
+│   │   └── `settings.php`          # Application settings & placeholder image configuration
+│   ├── `assets/`                   # CSS, JavaScript, images and other assets
+│   │   ├── `css/`                  # Compiled CSS files
+│   │   ├── `fonts/`                # Font files
+│   │   │   ├── `Outfit/`           # Outfit font files
+│   │   │   └── `remixicon/`        # Remix icon font files
+│   │   ├── `images/`               # Image assets
+│   │   ├── `js/`                   # JavaScript files
+│   │   │   ├── `admin-filters.js`  # Admin-specific filtering functionality
+│   │   │   ├── `breakpoints.js`    # Utility for accessing Tailwind breakpoints in JavaScript
+│   │   │   ├── `filter-core.js`    # Core filtering logic shared between admin/frontend
+│   │   │   ├── `frontend-filters.js` # Frontend-specific filtering functionality
+│   │   │   ├── `i18n.js`           # Internationalization utilities
+│   │   │   ├── `staff-form-utils.js` # Shared utilities for staff add/edit forms
+│   │   │   └── `main.js`           # Main application JavaScript
+│   │   └── `vendor/`               # Third-party libraries
+│   ├── `includes/`                 # PHP includes for the public pages
+│   │   ├── `404_handler.php`       # 404 error handler
+│   │   ├── `admin_footer.php`      # Admin page footer
+│   │   ├── `admin_header.php`      # Admin page header
+│   │   ├── `ajax_handlers.php`     # AJAX request handlers
+│   │   ├── `AssetManager.php`      # Asset path management
+│   │   ├── `bootstrap.php`         # Application bootstrap and configuration
+│   │   ├── `check_duplicate.php`   # AJAX endpoint for staff duplicate detection
+│   │   ├── `controllers/`          # MVC controllers
+│   │   │   ├── `AdminController.php` # Admin area controller
+│   │   │   ├── `AjaxController.php` # AJAX request controller
+│   │   │   ├── `AuthController.php` # Authentication controller
+│   │   │   ├── `HomeController.php` # Frontend controller
+│   │   │   └── `ImageController.php` # Image handling controller
+│   │   ├── `footer.php`            # Frontend page footer
+│   │   ├── `functions.php`         # Utility functions
+│   │   ├── `generate_placeholder.php` # Placeholder image generator
+│   │   ├── `header.php`            # Frontend page header
+│   │   ├── `LanguageManager.php`   # Internationalization system
+│   │   ├── `MiddlewareStack.php`   # Middleware implementation
+│   │   ├── `paths.php`             # Centralized path configuration
+│   │   └── `Router.php`            # URL routing system
+│   └── `uploads/`                  # User uploaded content
+│       ├── `companies/`            # Company logo images
+│       ├── `logos/`                # Application logo images
+│       └── `placeholders/`         # Generated placeholder images (WebP format)
 ├── `config/`                       # Configuration files (moved outside web root for security)
 │   ├── `app.php`                   # Application configuration settings
 │   ├── `auth_config.php`           # Centralized authentication configuration

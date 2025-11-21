@@ -13,7 +13,9 @@ This guide provides step-by-step instructions for deploying the Staff Directory 
 ### Option A: Using the Web Installer (Recommended)
 
 1. Upload the application files to your server (see Step 3 for required files)
-2. Navigate to `https://your-domain.com/staff-directory/install.php` in your browser
+2. Navigate to the installer in your browser:
+   - If installed in root: `https://your-domain.com/install.php`
+   - If installed in subdirectory: `https://your-domain.com/staff-directory/install.php`
 3. Follow the on-screen instructions to:
    - Configure your database connection
    - Set up your admin account
@@ -62,11 +64,11 @@ Before uploading files, you need to configure the application:
    DEFAULT_LANGUAGE=en
    ```
 
-2. **IMPORTANT**: Configure the application paths by editing the `public/staff-directory/includes/paths.local.php` file.
+2. **IMPORTANT**: Configure the application paths by editing the `public/includes/paths.local.php` file.
 
    The application uses a centralized path configuration system that makes installation easier. If the automatic path detection doesn't work correctly, you can customize the paths by:
 
-   1. Copy `public/staff-directory/includes/paths.local.php.example` to `public/staff-directory/includes/paths.local.php`
+   1. Copy `public/includes/paths.local.php.example` to `public/includes/paths.local.php`
    2. Edit the path constants in this file to match your server's directory structure
 
    ```php
@@ -116,7 +118,7 @@ Upload the following directories to your web server:
 | `logs/` | `/path/to/your/private/logs/` | Application logs (outside web root) |
 | `languages/` | `/path/to/your/private/languages/` | Translation files (outside web root) |
 | `database/` | `/path/to/your/private/database/` | SQL files and database utilities (outside web root) |
-| `public/staff-directory/` | `/path/to/your/public_html/staff-directory/` | Public web files (in web root) |
+| `public/` | `/path/to/your/public_html/` | Public web files (in web root) |
 
 ### Required Files
 
@@ -135,18 +137,20 @@ Make sure these specific files are included:
    - `database/migrate_tables.php` (for table prefix migration)
 
 2. **Core Application Files**:
-   - `public/staff-directory/front-controller.php`
-   - `public/staff-directory/includes/bootstrap.php`
-   - `public/staff-directory/includes/Router.php`
-   - `public/staff-directory/includes/MiddlewareStack.php`
-   - `public/staff-directory/includes/functions.php`
-   - `public/staff-directory/.htaccess`
-   - `public/staff-directory/install.php` (web-based installer)
+   - `public/front-controller.php`
+   - `public/index.php`
+   - `public/install.php` (web-based installer)
+   - `public/includes/bootstrap.php`
+   - `public/includes/paths.php`
+   - `public/includes/Router.php`
+   - `public/includes/MiddlewareStack.php`
+   - `public/includes/functions.php`
+   - `public/.htaccess`
 
 3. **Upload Directories** (create these if they don't exist):
-   - `public/staff-directory/uploads/companies/`
-   - `public/staff-directory/uploads/logos/`
-   - `public/staff-directory/uploads/placeholders/`
+   - `public/uploads/companies/`
+   - `public/uploads/logos/`
+   - `public/uploads/placeholders/`
 
 ## Step 4: Set Directory Permissions
 
@@ -160,10 +164,10 @@ chmod 755 /path/to/your/private/logs
 chmod 755 /path/to/your/private/vendor
 chmod 755 /path/to/your/private/languages
 chmod 755 /path/to/your/private/database
-chmod 775 /path/to/your/public_html/staff-directory/uploads
-chmod 775 /path/to/your/public_html/staff-directory/uploads/companies
-chmod 775 /path/to/your/public_html/staff-directory/uploads/logos
-chmod 775 /path/to/your/public_html/staff-directory/uploads/placeholders
+chmod 775 /path/to/your/public_html/uploads
+chmod 775 /path/to/your/public_html/uploads/companies
+chmod 775 /path/to/your/public_html/uploads/logos
+chmod 775 /path/to/your/public_html/uploads/placeholders
 ```
 
 ## Step 5: Using the Web Installer
@@ -175,22 +179,41 @@ The web installer (`install.php`) is the recommended way to set up your database
    - If the installer fails with "SQL file not found" errors, check that this directory exists and has the correct permissions
 
 2. **Running the Installer**:
-   - Navigate to `https://your-domain.com/staff-directory/install.php`
+   - Navigate to the installer:
+     - Root installation: `https://your-domain.com/install.php`
+     - Subdirectory installation: `https://your-domain.com/staff-directory/install.php`
    - Fill in your database credentials
    - Set your admin username and password
    - Choose whether to include example data
    - Click "Install Now" to complete the setup
 
 3. **Common Installer Issues**:
-   - If you see "SQL processor not found" errors, check that the `database/process_sql.php` file exists
-   - If you see "SQL file not found" errors, check that the `database/staff_dir_clean.sql` file exists
-   - If the installer can't create the database, ensure your database user has CREATE privileges
+   - **"SQL processor not found" error**: Check that the `database/process_sql.php` file exists and is readable
+   - **"SQL file not found" error**: Check that the `database/staff_dir_clean.sql` and `database/staff_dir.sql` files exist
+   - **Database creation fails**: Ensure your database user has CREATE DATABASE privileges
+   - **Connection test fails**: Verify database credentials (host, username, password)
+   - **Permission errors**: Ensure the web server can write to `staff_dir_env/.env` file
+   - **Already installed message**: If you need to reinstall, set `DB_INSTALLED=false` in `.env` file
+
+4. **Manual Installation Fallback**:
+   If the web installer fails, you can install manually:
+   1. Use Option B (Manual Database Setup) above to create the database
+   2. Manually edit `staff_dir_env/.env` file:
+      - Set database credentials (DB_HOST, DB_USER, DB_PASS, DB_NAME)
+      - Set `DB_TABLE_PREFIX=sd_` (or your preferred prefix)
+      - Set `DB_INSTALLED=true`
+      - Set admin credentials (ADMIN_USERNAME, ADMIN_PASSWORD)
+   3. Navigate to your website to verify it works
 
 ## Step 6: Verify Installation
 
-1. Navigate to your website: `https://your-domain.com/staff-directory/`
+1. Navigate to your website:
+   - Root installation: `https://your-domain.com/`
+   - Subdirectory installation: `https://your-domain.com/staff-directory/`
 2. You should see the staff directory homepage
-3. Try accessing the admin area: `https://your-domain.com/staff-directory/admin/`
+3. Try accessing the admin area:
+   - Root installation: `https://your-domain.com/admin/`
+   - Subdirectory installation: `https://your-domain.com/staff-directory/admin/`
 4. Log in with the admin credentials you set in the `.env` file or during installation
 
 ## Troubleshooting
@@ -225,13 +248,13 @@ If you're using table prefixes and encounter issues:
 If links or assets are not loading correctly, or you see "file not found" errors:
 
 - **Path Configuration**: This is the most common source of deployment issues
-  - The application now uses a centralized path configuration system in `public/staff-directory/includes/paths.php`
+  - The application now uses a centralized path configuration system in `public/includes/paths.php`
   - If automatic path detection doesn't work, create and edit `paths.local.php`:
-    1. Copy `public/staff-directory/includes/paths.local.php.example` to `paths.local.php`
+    1. Copy `public/includes/paths.local.php.example` to `paths.local.php`
     2. Edit the path constants to match your server's directory structure
     3. Use absolute paths (starting with `/`) rather than relative paths
 
-  **Typical Directory Structure:**
+  **Typical Directory Structure (Subdirectory Installation Example):**
   ```
   /home/username/                  <- Server root
   ├── private/                     <- BASE_PATH & PRIVATE_PATH (outside web root)
@@ -243,7 +266,7 @@ If links or assets are not loading correctly, or you see "file not found" errors
   │   └── vendor/
   │
   └── public_html/                 <- Web root
-      └── staff-directory/         <- APP_BASE_URI & PUBLIC_PATH
+      └── staff-directory/         <- APP_BASE_URI='/staff-directory' & PUBLIC_PATH
           ├── admin/
           ├── assets/
           ├── includes/

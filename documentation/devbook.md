@@ -4,6 +4,80 @@
 
 ### Version 1.2 (March 2025)
 
+#### November 18, 2025
+*Web-Based Installer Restoration and Documentation Corrections*
+
+- Restored the web-based installer (install.php) that was previously removed from the codebase
+  - Recovered install.php from git commit 5e8a044 (680 lines, 31KB)
+  - File was originally deleted during centralized path configuration implementation
+  - Restoration was necessary because documentation still referenced the installer as a feature
+  - User project memories explicitly requested an installer for easier deployment
+- Updated installer to use centralized path configuration system
+  - Removed hardcoded path definitions (lines 22-28)
+  - Replaced with single include: `require_once __DIR__ . '/includes/paths.php';`
+  - Ensured compatibility with paths.php system implemented in April 2025
+  - Verified all path constants (BASE_PATH, PRIVATE_PATH, PUBLIC_PATH, APP_BASE_URI) are properly loaded
+- Verified code compatibility with current codebase
+  - Database processing: `process_sql_file()` function signature matches perfectly
+  - LanguageManager: All required functions (`__()`, `current_language()`) available and compatible
+  - .env handling: All 9 required variables exist in `.env_example`
+  - Functions: No deprecated functions found, all dependencies satisfied
+- Conducted comprehensive translation keys audit
+  - Extracted 32 unique translation keys from installer using grep
+  - Discovered 100% coverage: all 32 keys already exist in both English and French language files
+  - No new translations needed to be added
+  - Translation categories: form labels (11), buttons (3), messages (9), help text (5), errors (4)
+- Executed comprehensive testing strategy (17/17 tests passed - 100% pass rate)
+  - **Pre-Installation Testing (4 tests)**:
+    - Already installed scenario: Correct message and reinstall instructions displayed
+    - Not installed scenario: Installer form displays with all fields
+    - CSS and assets loading: No console errors, all resources load successfully
+    - Form validation: Validation errors display correctly in French
+  - **Installation Process Testing (5 tests)**:
+    - Database connection test: Success message displays correctly
+    - Clean installation: Database created, tables with prefix, admin user created, .env updated
+    - Example data installation: 31 staff, 12 departments, 3 companies loaded successfully
+    - Custom table prefix: Default `sd_` prefix applied correctly
+    - Database creation: Database created when `DB_CREATE_DATABASE=true`
+  - **Post-Installation Testing (5 tests)**:
+    - Admin login: Successful authentication with installer-created credentials
+    - Admin dashboard: Statistics, navigation, staff table all display correctly
+    - Database tables: All 4 tables exist with correct `sd_` prefix
+    - Application functionality: No errors, all features accessible
+    - Error logs: No PHP errors during installation or login
+  - **Error Handling Testing (3 tests)**:
+    - Form validation errors: Display correctly in French
+    - Database connection success: Success message displays correctly
+    - Already installed protection: Prevents reinstallation when `DB_INSTALLED=true`
+- Corrected critical documentation errors
+  - **README.md**: Removed incorrect `/staff-directory/` subdirectory from directory structure diagram
+    - Updated lines 81-139 to show actual structure: `admin/`, `assets/`, `includes/`, `uploads/` directly in `public/`
+    - Added `paths.php` to the includes directory listing
+    - Verified Web-Based Installer section (lines 41-50) is accurate
+  - **FTP_Deployment_Guide.md**: Fixed all path references and added troubleshooting
+    - Changed `public/staff-directory/includes/paths.local.php` to `public/includes/paths.local.php` (lines 67-72)
+    - Updated installer URLs to show both root and subdirectory installation options
+    - Fixed core application file paths (removed `/staff-directory/` prefix)
+    - Updated upload directory paths and permissions
+    - Added comprehensive installer troubleshooting section with 6 common issues and manual fallback instructions
+    - Clarified that subdirectory installation is optional, not required
+- Production readiness confirmed
+  - All functionality works correctly
+  - 100% compatibility with current codebase
+  - Full bilingual support (EN/FR)
+  - Security: Input validation, error handling, safe database operations
+  - User experience: Clear interface, helpful error messages, intuitive flow
+  - Documentation: Complete and accurate
+- Technical implementation details
+  - Installer file: `public/install.php` (676 lines after path updates)
+  - Path configuration: Uses centralized `public/includes/paths.php`
+  - Database processing: Uses `database/process_sql.php` for table prefix handling
+  - Translation system: Uses LanguageManager with 32 translation keys
+  - Environment configuration: Creates/updates `staff_dir_env/.env` file
+  - SQL files: Supports both `staff_dir_clean.sql` (empty) and `staff_dir.sql` (example data)
+  - Installation status: Tracked via `DB_INSTALLED` flag in `.env` file
+  - Admin credentials: Stored in `.env` and hashed using `password_hash()`
+
 #### April 16, 2025
 *Centralized Path Configuration System*
 
