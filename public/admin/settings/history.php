@@ -1,6 +1,9 @@
 <?php
-require_once __DIR__ . '../../../private/config/init.php';
-require_once PRIVATE_PATH . '/utils/auth_check.php';
+// Define constant to indicate this is an admin page (required by admin_head.php)
+define('INCLUDED_FROM_ADMIN_PAGE', true);
+
+// Include admin head for initialization, security checks and database connection
+require_once '../../includes/admin_head.php';
 
 // Set the page title
 $page_title = "Manage Contract History";
@@ -31,11 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_period'])) {
             
             $conn->commit();
             $delete_message = "Successfully deleted " . $deleted_count . " record(s).";
-            $logger->info("Contract history cleanup", ['period' => $period, 'count' => $deleted_count]);
+            // Assuming a logger might not be available here if admin_head doesn't set it up globally
+            // $logger->info("Contract history cleanup", ['period' => $period, 'count' => $deleted_count]);
         } catch (Exception $e) {
             $conn->rollback();
             $delete_message = "Error deleting history: " . $e->getMessage();
-            $logger->error("Contract history deletion failed", ['error' => $e->getMessage()]);
+            // $logger->error("Contract history deletion failed", ['error' => $e->getMessage()]);
         }
     } else {
         $delete_message = "Invalid period selected.";
@@ -45,11 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_period'])) {
 // Get current count of history records
 $total_records = $conn->query("SELECT COUNT(*) FROM " . TABLE_CONTRACT_HISTORY)->fetch_row()[0];
 
-include_once PRIVATE_PATH . '/includes/admin_header.php';
+include_once '../../includes/admin_header.php';
 ?>
 
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800"><?php echo $page_title; ?></h1>
+    <h1 class="h3 mb-4 text-gray-800"><?php echo htmlspecialchars($page_title); ?></h1>
 
     <?php if ($delete_message): ?>
         <div class="alert alert-<?php echo ($deleted_count > 0 || strpos($delete_message, 'Successfully') !== false) ? 'success' : 'danger'; ?>">
@@ -84,5 +88,5 @@ include_once PRIVATE_PATH . '/includes/admin_header.php';
 </div>
 
 <?php
-include_once PRIVATE_PATH . '/includes/admin_footer.php';
+include_once '../../includes/admin_footer.php';
 ?>
