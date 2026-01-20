@@ -16,6 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $department_id = sanitize_input($_POST['department_id']);
     $job_title = sanitize_input($_POST['job_title']);
     $email = sanitize_input($_POST['email']);
+    $phone_number = sanitize_input($_POST['phone_number']);
+    $contract_start_date = sanitize_input($_POST['contract_start_date']);
+    $contract_end_date = sanitize_input($_POST['contract_end_date']);
 
     // Validate required fields
     if (empty($first_name) || empty($last_name) || empty($company_id) || empty($department_id) || empty($job_title) || empty($email)) {
@@ -46,11 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            $sql = "INSERT INTO " . TABLE_STAFF_MEMBERS . " (first_name, last_name, company_id, department_id, job_title, email, profile_picture)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO " . TABLE_STAFF_MEMBERS . " (first_name, last_name, company_id, department_id, job_title, email, phone_number, contract_start_date, contract_end_date, profile_picture)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssiisss", $first_name, $last_name, $company_id, $department_id, $job_title, $email, $profile_picture);
+            $stmt->bind_param("ssiissssss", $first_name, $last_name, $company_id, $department_id, $job_title, $email, $phone_number, $contract_start_date, $contract_end_date, $profile_picture);
 
             if ($stmt->execute()) {
                 set_session_message('success_message', __('staff_added'));
@@ -170,6 +173,35 @@ require_once '../includes/admin_header.php';
                    value="<?php echo isset($form_data['email']) ? htmlspecialchars($form_data['email']) : ''; ?>"
                    required
                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+
+        <div class="form-group mb-4">
+            <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1"><?php echo __('phone_number'); ?></label>
+            <input type="text"
+                   id="phone_number"
+                   name="phone_number"
+                   value="<?php echo isset($form_data['phone_number']) ? htmlspecialchars($form_data['phone_number']) : ''; ?>"
+                   class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="form-group">
+                <label for="contract_start_date" class="block text-sm font-medium text-gray-700 mb-1"><?php echo __('contract_start_date'); ?></label>
+                <input type="date"
+                       id="contract_start_date"
+                       name="contract_start_date"
+                       value="<?php echo isset($form_data['contract_start_date']) ? htmlspecialchars($form_data['contract_start_date']) : ''; ?>"
+                       class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+
+            <div class="form-group">
+                <label for="contract_end_date" class="block text-sm font-medium text-gray-700 mb-1"><?php echo __('contract_end_date'); ?></label>
+                <input type="date"
+                       id="contract_end_date"
+                       name="contract_end_date"
+                       value="<?php echo isset($form_data['contract_end_date']) ? htmlspecialchars($form_data['contract_end_date']) : ''; ?>"
+                       class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
         </div>
 
         <div class="form-group mb-4">

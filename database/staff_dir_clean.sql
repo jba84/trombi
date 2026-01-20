@@ -47,7 +47,10 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}staff_members` (
   `department_id` int(11) NOT NULL,
   `job_title` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
   `profile_picture` varchar(255) DEFAULT '',
+  `contract_start_date` date DEFAULT NULL,
+  `contract_end_date` date DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -56,6 +59,21 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}staff_members` (
   KEY `department_id` (`department_id`),
   CONSTRAINT `staff_members_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `{PREFIX}departments` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `staff_members_ibfk_2` FOREIGN KEY (`company_id`) REFERENCES `{PREFIX}companies` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Contract History Table
+CREATE TABLE IF NOT EXISTS `{PREFIX}contract_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `staff_id` int(11) NOT NULL,
+  `company_id` int(11) NOT NULL,
+  `department_id` int(11) NOT NULL,
+  `job_title` varchar(100) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `staff_id` (`staff_id`),
+  CONSTRAINT `contract_history_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `{PREFIX}staff_members` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Application Settings Table

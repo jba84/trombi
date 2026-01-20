@@ -30,6 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $department_id = sanitize_input($_POST['department_id']);
     $job_title = sanitize_input($_POST['job_title']);
     $email = sanitize_input($_POST['email']);
+    $phone_number = sanitize_input($_POST['phone_number']);
+    $contract_start_date = sanitize_input($_POST['contract_start_date']);
+    $contract_end_date = sanitize_input($_POST['contract_end_date']);
 
     // Validate required fields
     if (empty($first_name) || empty($last_name) || empty($company_id) || empty($department_id) || empty($job_title) || empty($email)) {
@@ -45,6 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: index.php");
             exit;
         }
+
+        // Archive the current contract if details have changed
+        if (
+            $current_staff['company_id'] != $company_id ||
+            $current_staff['department_id'] != $department_id ||
+            $current_staff['job_title'] != $job_title ||
+            $current_staff['contract_start_date'] != $contract_start_date ||
+            $current_staff['contract_end_date'] != $contract_end_date
+        ) {
+            archive_contract($conn, $id, $current_staff['company_id'], $current_staff['department_id'], $current_staff['job_title'], $current_staff['contract_start_date'], $current_staff['contract_end_date']);
+        }
+
         $profile_picture = $current_staff['profile_picture']; // Keep existing by default
 
         // First check if new profile picture is uploaded - this takes precedence over delete flag
@@ -87,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Update staff member in DB
         $sql = "UPDATE " . TABLE_STAFF_MEMBERS . " SET
                 first_name = ?, last_name = ?, company_id = ?, department_id = ?,
-                job_title = ?, email = ?, profile_picture = ?
+                job_title = ?, email = ?, phone_number = ?, contract_start_date = ?, contract_end_date = ?, profile_picture = ?
                 WHERE id = ?";
 
         $stmt = $conn->prepare($sql);
@@ -98,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $stmt->bind_param("ssiisssi", $first_name, $last_name, $company_id, $department_id, $job_title, $email, $profile_picture, $id);
+        $stmt->bind_param("ssiissssssi", $first_name, $last_name, $company_id, $department_id, $job_title, $email, $phone_number, $contract_start_date, $contract_end_date, $profile_picture, $id);
 
         if ($stmt->execute()) {
             // Clear form data on success before redirect
@@ -214,6 +229,22 @@ require_once '../includes/admin_header.php';
         </div>
 
         <div class="form-group mb-4">
+            <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1"><?php echo __('phone_number'); ?></label>
+            <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($form_data['phone_number'] ?? ''); ?>" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="form-group">
+                <label for="contract_start_date" class="block text-sm font-medium text-gray-700 mb-1"><?php echo __('contract_start_date'); ?></label>
+                <input type="date" id="contract_start_date" name="contract_start_date" value="<?php echo htmlspecialchars($form_data['contract_start_date'] ?? ''); ?>" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div class="form-group">
+                <label for="contract_end_date" class="block text-sm font-medium text-gray-700 mb-1"><?php echo __('contract_end_date'); ?></label>
+                <input type="date" id="contract_end_date" name="contract_end_date" value="<?php echo htmlspecialchars($form_data['contract_end_date'] ?? ''); ?>" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+        </div>
+
+        <div class="form-group mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1"><?php echo __('profile_picture'); ?></label>
 
             <!-- Visually hidden file input -->
@@ -277,6 +308,7 @@ require_once '../includes/admin_header.php';
         </div> <!-- End of form-group mb-4 for Profile Picture -->
 
         <div class="form-actions flex justify-end gap-3 mt-6 border-t border-gray-200 pt-4">
+             <a href="history.php?id=<?php echo $id; ?>" class="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300">Contract History</a>
             <a href="index.php"
                class="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300"><?php echo __('cancel'); ?></a>
             <button type="submit"
