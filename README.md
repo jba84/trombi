@@ -1,24 +1,31 @@
-# Staff Directory Application -- Version 1.2.8
+# Staff Directory Application -- Version 1.3.0
 
 A web-based staff directory application that allows administrators to manage staff members and provides a user-friendly interface for employees to browse the directory.
+
+**Note:** A significant portion of this application's code was generated and refactored using Google's AI assistant in the IDX/Firebase environment.
 
 Live demo available at: [https://staff-directory.jensen-siu.net/](https://staff-directory.jensen-siu.net/)
 
 ## Features
 
 ### Admin Dashboard
-- Add new staff members with details like name, company, department, job title, email, and profile picture
-  - Real-time duplicate checking prevents adding staff with identical names or email addresses
-- Edit existing staff members
-- Delete staff members
-- Manage companies with logo upload functionality
-- Manage departments with custom color coding
-- View company statistics and staff distribution
-- Filter and search functionality for staff list
-- Customizable application settings (logo, default placeholder image for staff members, and title)
-- Multilingual support with English and French translations
-- Protected by authentication system
-- Flexible deployment options (root or subdirectory installation)
+- Add new staff members with details like name, company, department, job title, email, phone number, contract dates, and profile picture.
+  - Real-time duplicate checking prevents adding staff with identical names or email addresses.
+- Edit existing staff members.
+- Delete staff members.
+- **Contract History Management**:
+    - Automatically archives previous contract details when a staff member's role, company, or department is updated.
+    - Archives the final contract details when a staff member is deleted.
+    - Provides a dedicated history page for each staff member to view their contract history.
+    - Includes a feature to purge contract history records before a specified date for data retention management.
+- Manage companies with logo upload functionality.
+- Manage departments with custom color coding.
+- View company statistics and staff distribution.
+- Filter and search functionality for staff list.
+- Customizable application settings (logo, default placeholder image for staff members, and title).
+- Multilingual support with English and French translations.
+- Protected by authentication system.
+- Flexible deployment options (root or subdirectory installation).
 
 ### Frontend Display
 - Grid view of staff members
@@ -94,6 +101,7 @@ The application follows a secure directory structure:
 │   │   ├── `companies.php`         # Company management interface
 │   │   ├── `departments.php`       # Department management interface
 │   │   ├── `edit.php`              # Edit existing staff member
+│   │   ├── `history.php`           # Staff member contract history
 │   │   ├── `index.php`             # Admin dashboard page
 │   │   └── `settings.php`          # Application settings & placeholder image configuration
 │   ├── `assets/`                   # CSS, JavaScript, images and other assets
@@ -392,4 +400,3 @@ To customize the Tailwind configuration:
 4. **Font issues:**
    - Ensure the font files are correctly copied to the public directory
    - Check the font paths in `src/input.scss` to make sure they match the actual file locations
-
