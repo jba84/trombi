@@ -7,7 +7,7 @@
  * @param string $path The path relative to the application base
  * @return string The full URL with the correct base path
  */
-function url($path = '') {
+/**function url($path = '') {
     // Remove leading slash if present
     $path = ltrim($path, '/');
 
@@ -17,7 +17,23 @@ function url($path = '') {
     }
 
     return APP_BASE_URI . ($path ? '/' . $path : '');
+}*/
+/**
+ * Generate a URL with the correct base path
+ * Corrigé pour PHP 8.4 (gestion du type string)
+ */
+function url(?string $path = '') {
+    // Force la conversion en string pour éviter l'erreur sur ltrim(null)
+    $path = (string)$path;
+    $path = ltrim($path, '/');
+
+    if (empty(APP_BASE_URI) && empty($path)) {
+        return '/';
+    }
+
+    return APP_BASE_URI . ($path ? '/' . $path : '');
 }
+
 
 /**
  * Load application configuration
@@ -420,13 +436,28 @@ function get_staff_image_url($staff, $size = '600x600', $font_weight = null, $bg
  * @param bool $encode_html Whether to encode HTML special characters (default: false)
  * @return string The sanitized data
  */
-function sanitize_input($data, $encode_html = false) {
+/**function sanitize_input($data, $encode_html = false) {
     $data = trim($data);
     $data = stripslashes($data);
 
     // Only encode HTML special characters if requested
     if ($encode_html) {
         $data = htmlspecialchars($data);
+    }
+
+    return $data;
+}*/
+/**
+ * Sanitize input data
+ * Corrigé pour PHP 8.4
+ */
+function sanitize_input(?string $data, bool $encode_html = false): string {
+    $data = (string)$data;
+    $data = trim($data);
+    $data = stripslashes($data);
+
+    if ($encode_html) {
+        $data = htmlspecialchars($data, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     return $data;
@@ -468,6 +499,8 @@ function upload_profile_picture($file) {
 /**
  * Get all staff members
  */
+
+ 
 function get_all_staff_members($conn, $sort_by = 'last_name', $sort_order = 'ASC', $search = '', $department = '', $company = '') {
     // Validate sort_by and sort_order parameters
     $allowed_sort_fields = ['first_name', 'last_name', 'department', 'job_title', 'email', 'id', 'company'];
