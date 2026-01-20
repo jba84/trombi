@@ -51,6 +51,12 @@ if ($_ENV['DEV_MODE'] === 'true') {
 
 // Load core dependencies
 require_once PRIVATE_PATH . '/config/database.php';
+
+// Define table constants
+if (!defined('TABLE_CONTRACT_HISTORY')) {
+    define('TABLE_CONTRACT_HISTORY', 'contract_history');
+}
+
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/AssetManager.php';
 
