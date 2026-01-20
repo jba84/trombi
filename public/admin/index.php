@@ -17,12 +17,20 @@ $success_message = get_session_message('success_message');
 // Delete staff member if requested
 if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     $id = sanitize_input($_GET['delete']);
-    if (delete_staff_member($conn, $id)) {
-        set_session_message('success_message', __("staff_deleted"));
-        header("Location: index.php");
-        exit;
+    $staff_member = get_staff_member_by_id($conn, $id);
+    if ($staff_member) {
+        archive_contract($conn, $id, $staff_member['company_id'], $staff_member['department_id'], $staff_member['job_title'], $staff_member['contract_start_date'], $staff_member['contract_end_date']);
+        if (delete_staff_member($conn, $id)) {
+            set_session_message('success_message', __("staff_deleted"));
+            header("Location: index.php");
+            exit;
+        } else {
+            set_session_message('error_message', __("error_deleting_staff"));
+            header("Location: index.php");
+            exit;
+        }
     } else {
-        set_session_message('error_message', __("error_deleting_staff"));
+        set_session_message('error_message', __("staff_not_found"));
         header("Location: index.php");
         exit;
     }
