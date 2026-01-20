@@ -2,21 +2,36 @@
 // Standalone upgrade script for version 1.3.0
 // This script should be placed in the 'database' directory and run from the project root.
 
-echo "Starting upgrade to version 1.3.0...\n";
+// --- Setup Pathing and Configuration ---
 
-// Define a base path to locate the bootstrap file
-define('BASE_PATH', dirname(__DIR__));
+// Define a base path to locate the necessary include files.
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', dirname(__DIR__));
+}
 
-// --- Environment and Database Setup ---
-// Include the bootstrap file to get the database connection and constants
-// We need to define INCLUDED_FROM_UPGRADE_SCRIPT to bypass any routing/output logic.
-define('INCLUDED_FROM_UPGRADE_SCRIPT', true);
-$bootstrap_path = BASE_PATH . '/public/includes/bootstrap.php';
+// 1. Include paths configuration first, which is essential.
+$paths_file = BASE_PATH . '/public/includes/paths.php';
+if (!file_exists($paths_file)) {
+    die("Error: Critical file not found: {$paths_file}. Please ensure paths are correct and run from the project root.\n");
+}
+require_once $paths_file;
 
+// 2. Define a constant to signal to bootstrap.php that this is a command-line script.
+// This can be used to prevent actions like starting sessions or sending headers.
+if (!defined('INCLUDED_FROM_UPGRADE_SCRIPT')) {
+    define('INCLUDED_FROM_UPGRADE_SCRIPT', true);
+}
+
+// 3. Now, include the main bootstrap file which sets up the database connection.
+$bootstrap_path = PUBLIC_PATH . '/includes/bootstrap.php';
 if (!file_exists($bootstrap_path)) {
-    die("Error: Could not find bootstrap file at: {$bootstrap_path}. Make sure you are running this script from the project root.\n");
+    die("Error: Critical file not found: {$bootstrap_path}.\n");
 }
 require_once $bootstrap_path;
+
+// --- Begin Execution ---
+
+echo "Starting upgrade to version 1.3.0...\n";
 
 // Check if the database connection was successful
 if (!$conn) {
@@ -26,7 +41,7 @@ if (!$conn) {
 // --- Migration ---
 echo "Attempting to create 'contract_history' table...\n";
 
-// The table name is already defined with its prefix in bootstrap.php via config/database.php
+// The table name is already defined with its prefix in bootstrap.php
 $tableName = TABLE_CONTRACT_HISTORY;
 
 $sql = "
