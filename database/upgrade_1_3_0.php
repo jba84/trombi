@@ -4,8 +4,8 @@
 
 // --- Setup Pathing and Configuration ---
 
-// 1. Manually define core paths for robustness. 
-//    This avoids issues with including files from a command-line context.
+// 1. Manually define all required path constants for robustness.
+//    This ensures the script does not depend on the include context of other files.
 if (!defined('BASE_PATH')) {
     // __DIR__ is the directory of this script (/database), so dirname(__DIR__) is the project root.
     define('BASE_PATH', dirname(__DIR__));
@@ -13,18 +13,22 @@ if (!defined('BASE_PATH')) {
 if (!defined('PUBLIC_PATH')) {
     define('PUBLIC_PATH', BASE_PATH . '/public');
 }
+if (!defined('PRIVATE_PATH')) {
+    // Based on the project structure, the private path is the same as the base path.
+    define('PRIVATE_PATH', BASE_PATH);
+}
 
 // 2. Define a constant to signal to bootstrap.php that this is a command-line script.
-//    This should prevent it from trying to start a session.
 if (!defined('INCLUDED_FROM_UPGRADE_SCRIPT')) {
     define('INCLUDED_FROM_UPGRADE_SCRIPT', true);
 }
 
-// 3. Now, locate and include the main bootstrap file which sets up the database connection.
+// 3. Now, locate and include the main bootstrap file.
 $bootstrap_path = PUBLIC_PATH . '/includes/bootstrap.php';
 if (!file_exists($bootstrap_path)) {
     die("Error: Critical file not found: {$bootstrap_path}. Please ensure you are running the script from your project's root directory.\n");
 }
+// We include it here, which sets up the database connection and other initial configurations.
 require_once $bootstrap_path;
 
 // --- Begin Execution ---
