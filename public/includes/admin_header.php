@@ -93,6 +93,11 @@ $admin_title = $app_settings['admin_title']; // Default is already provided by l
                         </a>
                     </li>
                     <li class="w-full nav:w-auto">
+                        <a href="<?php echo url('admin/settings/history.php'); ?>" class="icon-link flex items-center h-10 px-3 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-600 hover:border-gray-300 transition-colors duration-200 w-full nav:w-auto justify-start nav:justify-center">
+                            <i class="ri-history-line mr-2 nav:mr-1"></i> <span class="nav:hidden inline">Manage History</span><span class="hidden nav:inline">Manage History</span>
+                        </a>
+                    </li>
+                    <li class="w-full nav:w-auto">
                         <a href="<?php echo url(''); ?>" target="_blank" class="icon-link flex items-center h-10 px-3 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-600 hover:border-gray-300 transition-colors duration-200 w-full nav:w-auto justify-start nav:justify-center">
                             <i class="ri-eye-2-line mr-2 nav:mr-1"></i> <span class="nav:hidden inline"><?php echo __('home'); ?></span><span class="hidden nav:inline"><?php echo __('home'); ?></span>
                         </a>
