@@ -99,8 +99,21 @@ function asset(string $path): string { return url('assets/' . ltrim($path, '/'))
 function sanitize_input(?string $input): string { return htmlspecialchars(trim((string)$input), ENT_QUOTES, 'UTF-8'); }
 
 function get_staff_image_url($staff) {
-    $photo = $staff['profile_picture'] ?? null;
-    return (!empty($photo) && file_exists(PUBLIC_PATH . "/uploads/" . $photo)) ? asset('uploads/' . $photo) : null;
+    // On récupère le nom de fichier (compatible avec les anciens et nouveaux noms de colonnes)
+    $photo = $staff['profile_picture'] ?? $staff['photo'] ?? null;
+    
+    // Si pas de photo, on retourne null (ce qui affichera les initiales colorées)
+    if (empty($photo)) {
+        return null;
+    }
+
+    // Vérification physique sur le disque
+    if (file_exists(PUBLIC_PATH . "/uploads/" . $photo)) {
+        // CORRECTION ICI : On utilise url() pour pointer vers /uploads/ et non /assets/uploads/
+        return url('uploads/' . $photo);
+    }
+
+    return null;
 }
 
 function get_text_contrast_class($hex) {
