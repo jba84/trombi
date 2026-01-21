@@ -3,32 +3,44 @@
  * Core utility functions - PDO & PHP 8.4 Ready
  */
 
-if (!function_exists('url')) {
-    function url(string $path = ''): string {
-        $path = ltrim($path, '/');
-        $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        return htmlspecialchars($scheme . '://' . $host . '/' . $path, ENT_QUOTES, 'UTF-8');
-    }
+// --- CONFIGURATION ---
+
+function load_app_settings(string $file = 'app'): array {
+    $configPath = CONFIG_PATH . '/' . $file . '.php';
+    if (!file_exists($configPath)) return [];
+    $config = require $configPath;
+    return is_array($config) ? $config : [];
 }
 
-if (!function_exists('asset')) {
-    function asset(string $path): string {
-        return url('assets/' . ltrim($path, '/'));
-    }
+function load_app_config(string $file = 'app'): array {
+    return load_app_settings($file);
 }
 
-if (!function_exists('sanitize_input')) {
-    function sanitize_input(?string $input): string {
-        return htmlspecialchars(trim((string)$input), ENT_QUOTES, 'UTF-8');
+// --- DATABASE & CONNECTION ---
+
+function getDBConnection(): PDO {
+    static $conn = null;
+    if ($conn === null) {
+        require_once CONFIG_PATH . '/database.php';
+        try {
+            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+            $conn = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]);
+        } catch (PDOException $e) {
+            die("Erreur de connexion : " . $e->getMessage());
+        }
     }
+    return $conn;
 }
 
-// --- DATABASE FUNCTIONS ---
+// --- STAFF DATA ---
 
 function get_all_staff_members(PDO $conn, string $sort_by = 'last_name', string $sort_order = 'ASC', string $search = '', string $department = '', string $company = ''): array {
     $params = [];
-    $sql = "SELECT s.*, c.name AS company, d.name AS department, d.color AS department_color, c.logo AS company_logo
+    $sql = "SELECT s.*, c.name AS company, d.name AS department, d.color AS department_color
             FROM staff_members s 
             LEFT JOIN companies c ON s.company_id = c.id 
             LEFT JOIN departments d ON s.department_id = d.id
@@ -58,11 +70,7 @@ function get_all_staff_members(PDO $conn, string $sort_by = 'last_name', string 
 }
 
 function get_staff_member_by_id(PDO $conn, int $id) {
-    $stmt = $conn->prepare("SELECT s.*, c.name AS company_name, d.name AS department_name 
-                            FROM staff_members s 
-                            LEFT JOIN companies c ON s.company_id = c.id 
-                            LEFT JOIN departments d ON s.department_id = d.id 
-                            WHERE s.id = :id");
+    $stmt = $conn->prepare("SELECT s.*, c.name AS company_name, d.name AS department_name FROM staff_members s LEFT JOIN companies c ON s.company_id = c.id LEFT JOIN departments d ON s.department_id = d.id WHERE s.id = :id");
     $stmt->execute([':id' => $id]);
     return $stmt->fetch();
 }
@@ -75,43 +83,29 @@ function get_active_company_names(PDO $conn): array {
     return $conn->query("SELECT DISTINCT c.name FROM companies c JOIN staff_members s ON c.id = s.company_id ORDER BY c.name")->fetchAll(PDO::FETCH_COLUMN);
 }
 
-function get_all_companies(PDO $conn): array {
-    return $conn->query("SELECT * FROM companies ORDER BY name")->fetchAll();
-}
+// --- UTILS ---
 
-function get_all_departments(PDO $conn): array {
-    return $conn->query("SELECT * FROM departments ORDER BY name")->fetchAll();
-}
-
-function archive_contract(PDO $conn, int $staff_id, ?string $start_date, ?string $end_date): bool {
-    if (empty($start_date)) return true;
-    $stmt = $conn->prepare("INSERT INTO contract_history (staff_id, start_date, end_date, archived_at) VALUES (:id, :s, :e, NOW())");
-    return $stmt->execute([':id' => $staff_id, ':s' => $start_date, ':e' => $end_date]);
-}
-
-// --- SYSTEM ---
-
-function getDBConnection(): PDO {
-    static $conn = null;
-    if ($conn === null) {
-        require_once dirname(__DIR__) . '/config/database.php';
-        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-        $conn = new PDO($dsn, DB_USER, DB_PASS, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]);
+if (!function_exists('url')) {
+    function url(string $path = ''): string {
+        $path = ltrim($path, '/');
+        $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        return htmlspecialchars($scheme . '://' . $host . '/' . $path, ENT_QUOTES, 'UTF-8');
     }
-    return $conn;
 }
 
-function get_staff_image_url($staff, $size = '150x150') {
-    $photo = $staff['profile_picture'] ?? $staff['photo'] ?? null;
+function asset(string $path): string { return url('assets/' . ltrim($path, '/')); }
+
+function sanitize_input(?string $input): string { return htmlspecialchars(trim((string)$input), ENT_QUOTES, 'UTF-8'); }
+
+function get_staff_image_url($staff) {
+    $photo = $staff['profile_picture'] ?? null;
     return (!empty($photo) && file_exists(PUBLIC_PATH . "/uploads/" . $photo)) ? asset('uploads/' . $photo) : null;
 }
 
 function get_text_contrast_class($hex) {
     $hex = ltrim($hex, '#');
+    if(strlen($hex) == 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
     $r = hexdec(substr($hex, 0, 2)); $g = hexdec(substr($hex, 2, 2)); $b = hexdec(substr($hex, 4, 2));
     return ((($r * 299) + ($g * 587) + ($b * 114)) / 1000) > 190 ? 'dark-text' : 'light-text';
 }
