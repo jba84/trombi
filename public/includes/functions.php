@@ -68,8 +68,9 @@ if (!function_exists('sanitize_input')) {
  */
 function get_all_staff_members(PDO $conn): array
 {
+    // Correction : staff -> staff_members
     $stmt = $conn->query("SELECT s.*, c.name AS company_name, d.name AS department_name 
-                            FROM staff s 
+                            FROM staff_members s 
                             LEFT JOIN companies c ON s.company_id = c.id 
                             LEFT JOIN departments d ON s.department_id = d.id
                             ORDER BY s.last_name, s.first_name");
@@ -85,8 +86,10 @@ function get_all_staff_members(PDO $conn): array
  */
 function get_staff_member_by_id(PDO $conn, int $id)
 {
-    $stmt = $conn->prepare("SELECT s.id, s.first_name, s.last_name, s.email, s.phone, s.job_title, s.company_id, s.department_id, s.photo, s.contract_start_date, s.contract_end_date, c.name AS company_name, d.name AS department_name 
-                            FROM staff s 
+    // Correction : staff -> staff_members
+    // J'ai aussi ajouté les nouveaux champs dans le SELECT pour être sûr
+    $stmt = $conn->prepare("SELECT s.*, c.name AS company_name, d.name AS department_name 
+                            FROM staff_members s 
                             LEFT JOIN companies c ON s.company_id = c.id 
                             LEFT JOIN departments d ON s.department_id = d.id 
                             WHERE s.id = :id");
@@ -141,12 +144,14 @@ function get_company_name_by_id(PDO $conn, int $company_id): ?string
  * @param int $department_id The ID of the department.
  * @return string|null The department name or null if not found.
  */
-function get_department_name_by_id(PDO $conn, int $department_id): ?string
+
+
+function get_staff_count_by_department_id(PDO $conn, int $department_id): int
 {
-    $stmt = $conn->prepare("SELECT name FROM departments WHERE id = :id");
-    $stmt->execute([':id' => $department_id]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result ? $result['name'] : null;
+    // Correction : staff -> staff_members
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM staff_members WHERE department_id = :department_id");
+    $stmt->execute([':department_id' => $department_id]);
+    return (int) $stmt->fetchColumn();
 }
 
 /**
@@ -158,7 +163,8 @@ function get_department_name_by_id(PDO $conn, int $department_id): ?string
  */
 function get_staff_count_by_company_id(PDO $conn, int $company_id): int
 {
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM staff WHERE company_id = :company_id");
+    // Correction : staff -> staff_members
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM staff_members WHERE company_id = :company_id");
     $stmt->execute([':company_id' => $company_id]);
     return (int) $stmt->fetchColumn();
 }
