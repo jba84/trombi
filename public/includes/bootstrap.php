@@ -1,73 +1,45 @@
 <?php
-// Start session first to avoid header warnings
+
+/**
+ * Main application bootstrap file.
+ *
+ * This file handles session initialization, error reporting,
+ * and includes the core functions. It's the central point
+ * of setup for the entire application.
+ */
+
+// Start the session to handle messages and user state.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Include centralized path configuration
+// Set error reporting for development.
+// In a production environment, you would log errors instead of displaying them.
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
+// --- FINAL BOOTSTRAP ORDER ---
+
+// 1. Define core path constants.
 require_once __DIR__ . '/paths.php';
 
-// Require autoloader - now PRIVATE_PATH is defined
-require_once PRIVATE_PATH . '/vendor/autoload.php';
-
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Processor\IntrospectionProcessor;
-use Monolog\Formatter\LineFormatter;
-
-// Include auth system first to setup authentication constants
-require_once PUBLIC_PATH . '/admin/auth/auth.php';
-
-// Create global logger instance
-$logger = new Logger('staff-directory');
-
-// Add processors for extra information
-$logger->pushProcessor(new IntrospectionProcessor());
-
-if ($_ENV['DEV_MODE'] === 'true') {
-    // Development logging setup
-    $debugHandler = new StreamHandler(
-        PRIVATE_PATH . '/logs/debug.log',
-        Logger::DEBUG
-    );
-
-    // Custom format to match old debug_log style
-    $debugFormatter = new LineFormatter(
-        "[%datetime%] %channel%.%level_name%: %message% %context%\n",
-        "Y-m-d H:i:s" // Date format
-    );
-    $debugHandler->setFormatter($debugFormatter);
-    $logger->pushHandler($debugHandler);
+// 2. Load the Composer autoloader. This is crucial for all external libraries.
+if (file_exists(PRIVATE_PATH . '/vendor/autoload.php')) {
+    require_once PRIVATE_PATH . '/vendor/autoload.php';
 } else {
-    // Production logging setup
-    $productionHandler = new RotatingFileHandler(
-        PRIVATE_PATH . '/logs/app.log',
-        30, // Keep 30 days of logs
-        Logger::ERROR
-    );
-    $logger->pushHandler($productionHandler);
+    // Provide a clear error message if dependencies are not installed.
+    die("<h1>Composer autoloader not found.</h1><p>Please run <code>composer install</code> in the project root to install dependencies.</p>");
 }
 
-// Load core dependencies
-require_once PRIVATE_PATH . '/config/database.php';
-
-// Define table constants
-if (!defined('TABLE_CONTRACT_HISTORY')) {
-    define('TABLE_CONTRACT_HISTORY', 'contract_history');
-}
-
-require_once __DIR__ . '/functions.php';
-require_once __DIR__ . '/AssetManager.php';
-
-// Load language manager
+// 3. Load core application classes that are not managed by Composer.
+require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/LanguageManager.php';
 
-// Initialize language manager (this will detect and set the current language)
-$languageManager = LanguageManager::getInstance();
 
-// Initialize AssetManager
-$assetManager = new AssetManager(PUBLIC_PATH);
+// 4. Include the core application helper functions, which depend on the classes above.
+require_once __DIR__ . '/functions.php';
 
-// Make logger and language manager available globally
-global $logger, $languageManager;
+// 5. Create the global database connection using the now-available functions.
+$conn = getDBConnection();
