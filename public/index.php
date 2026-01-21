@@ -1,5 +1,9 @@
 <?php
-require_once 'includes/header.php';
+// 1. Charger le bootstrap en PREMIER (c'est lui qui charge LanguageManager, la BDD, etc.)
+require_once __DIR__ . '/includes/bootstrap.php';
+
+// 2. Ensuite seulement, on peut charger le header ou utiliser les fonctions
+require_once __DIR__ . '/includes/header.php';
 
 // Get filter parameters
 $search = isset($_GET['search']) ? sanitize_input($_GET['search']) : '';
