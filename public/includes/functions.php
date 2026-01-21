@@ -299,10 +299,10 @@ function getDBConnection(): PDO
  *
  * @return string The current language code (e.g., 'en').
  */
-function current_language(): string
+/*function current_language(): string
 {
     return getLanguageManager()->getCurrentLanguage();
-}
+}*/
 
 /**
  * Helper function for translations.
@@ -311,7 +311,8 @@ function current_language(): string
  * @param array $replacements Placeholders to replace in the translation string.
  * @return string The translated string.
  */
-function __(string $key, array $replacements = []): string
+/*function __(string $key, array $replacements = []): string
 {
     return getLanguageManager()->get($key, $replacements);
 }
+*/
